@@ -1,0 +1,78 @@
+SEM5 PROJECT 
+ON STM32 BASED PASSWORD SECURITY CODE: code from gpt
+#include "stm32f1xx_hal.h"
+#include "lcd.h"
+#include "keypad.h"
+
+#define PASSWORD_LENGTH 4
+#define PASSWORD "1234"  // Define your password here
+
+char enteredPassword[PASSWORD_LENGTH];
+int currentIndex = 0;
+
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+    MX_GPIO_Init();
+
+    lcd_init();   // Initialize LCD
+    keypad_init();  // Initialize Keypad
+
+    lcd_clear();
+    lcd_set_cursor(0, 0);
+    lcd_print("Enter Password:");
+
+    while (1) {
+        char key = keypad_get_key();
+
+        if (key != '\0') { // Check if any key is pressed
+            lcd_set_cursor(currentIndex, 1);
+            lcd_write_char('*');  // Display * for each digit
+            enteredPassword[currentIndex++] = key;
+
+            if (currentIndex == PASSWORD_LENGTH) {
+                enteredPassword[currentIndex] = '\0';
+                currentIndex = 0;
+
+                if (strcmp(enteredPassword, PASSWORD) == 0) {
+                    lcd_clear();
+                    lcd_set_cursor(0, 0);
+                    lcd_print("Access Granted");
+                    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET); // Optional: Turn on LED or Buzzer
+                } else {
+                    lcd_clear();
+                    lcd_set_cursor(0, 0);
+                    lcd_print("Access Denied");
+                    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET); // Optional: Turn off LED or Buzzer
+                }
+
+                HAL_Delay(2000);
+                lcd_clear();
+                lcd_set_cursor(0, 0);
+                lcd_print("Enter Password:");
+            }
+        }
+    }
+}
+
+void SystemClock_Config(void) {
+    // Clock configuration (Auto-generated code from STM32CubeMX)
+}
+
+static void MX_GPIO_Init(void) {
+    // GPIO Initialization (Auto-generated code from STM32CubeMX)
+    
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    // Configure GPIO pin for LED (optional)
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    GPIO_InitStruct.Pin = GPIO_PIN_5;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    // Initialize other required GPIOs here
+}
