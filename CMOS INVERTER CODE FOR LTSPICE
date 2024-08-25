@@ -1,0 +1,13 @@
+#code to implement cmos inverter on ltspice :
+VTC of CMOS inverter
+VDD 1 0 DC 1.8v
+VD 1 4 DC 0v
+.include "C:\Users\student\Documents\vlsi r1\mosmodel.txt"
+Mn 3 2 0 0 CMOSN W=5u L=0.18u
+MP 3 2 4 1 CMOSP W=10u L=0.18u
+Vin 2 0 DC 1.8v
+.DC Vin 0 1.8v 0.001
+.PLOT V(30)
+.PLOT D(V(3))
+.PLOT I(VD)*VDD
+.END
